@@ -1,0 +1,69 @@
+{% extends 'user/user_panel.html' %}
+{% block body %}
+<form action="/summarizepost" method="post" enctype="multipart/form-data">
+
+
+<table class="table table-borderless">
+   
+    <tr>
+        <td><font color="black"><strong>Type Here</strong></font></td>
+      
+      </tr>
+    
+      <tr>
+          <td>
+              <textarea name="txt" rows="10" class="form-control"></textarea>
+       </td>
+      </tr>
+      <tr>
+          <td>
+              <input type="submit" value="Summarize" class="btn btn-success"/>
+          </td>
+      </tr>
+  </table>
+
+    {% if p %}
+
+        <h1>Features</h1>
+
+        <p>
+            {{ p }}
+        </p>
+
+      
+
+   <br>
+
+        <h2>Predicted Result: {{ p }}</h2>
+
+    {% endif %}
+
+
+
+
+
+
+</form>
+
+<script src="/static/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#song').bind('change', function() {
+            //this.files[0].size gets the size of your file.
+            var val=$('#song').val().toLowerCase();
+            var regex=new RegExp("(.*?)\.(wav)$");
+            if(val==''){
+              alert("no file selected");
+               event.preventDefault();
+          } else if(!(regex.test(val))){
+              alert("Selected file not WAV..");
+              $('.uploadExtensionError').show();
+              $('#song').val('');
+              event.preventDefault();
+          }
+
+        });
+    });
+</script>
+
+{% endblock %}
