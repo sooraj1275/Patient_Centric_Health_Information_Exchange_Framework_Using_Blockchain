@@ -1,39 +1,65 @@
 {
-  "name": "Majestic_admin",
-  "version": "1.1.0",
-  "description": "",
-  "main": "index.html",
-  "dependencies": {
-    "@mdi/font": "^3.6.95",
-    "bootstrap": "4.3.1",
-    "chart.js": "^2.8.0",
-    "datatables": "^1.10.18",
-    "datatables.net-bs4": "^1.10.19",
-    "del": "^4.1.1",
-    "gulp-sourcemaps": "^2.6.3",
-    "jquery": "^3.4.1",
-    "perfect-scrollbar": "^1.4.0",
-    "popper.js": "^1.15.0"
-  },
-  "devDependencies": {
-    "browser-sync": "^2.16.0",
-    "compass-mixins": "^0.12.10",
-    "gulp": "^4.0.2",
-    "gulp-concat": "^2.6.1",
-    "gulp-inject": "^5.0.2",
-    "gulp-inject-partials": "^1.0.3",
-    "gulp-rename": "^1.2.2",
-    "gulp-replace": "^1.0.0",
-    "gulp-sass": "^4.0.2",
-    "merge-stream": "^1.0.1",
-    "minimatch": "^3.0.4",
-    "node-sass": "^4.12.0"
-  },
+  "name": "jszip",
+  "version": "3.1.5",
+  "author": "Stuart Knightley <stuart@stuartk.com>",
+  "description": "Create, read and edit .zip files with JavaScript http://stuartk.com/jszip",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run test-node && npm run test-browser",
+    "test-node": "qunit-cli -c test/helpers/test-utils.js test/helpers/node-test-utils.js test/asserts/*.js",
+    "test-browser": "grunt build && grunt test",
+    "lint": "grunt jshint"
   },
-  "author": "bootstrapdash",
-  "url": "http://www.bootstrapdash.com/",
-  "copyright": "",
-  "license": ""
+  "contributors": [
+    {
+      "name": "Franz Buchinger"
+    },
+    {
+      "name": "António Afonso"
+    },
+    {
+      "name": "David Duponchel"
+    },
+    {
+      "name": "yiminghe"
+    }
+  ],
+  "main": "./lib/index",
+  "browser": {
+    "readable-stream": "./lib/readable-stream-browser.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Stuk/jszip.git"
+  },
+  "keywords": [
+    "zip",
+    "deflate",
+    "inflate"
+  ],
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-cli": "~1.1.0",
+    "grunt-saucelabs": "8.6.2",
+    "grunt-contrib-connect": "1.0.0",
+    "jshint": "~2.9.1",
+    "browserify": "~13.0.0",
+    "grunt-browserify": "~5.0.0",
+    "grunt-contrib-jshint": "~1.0.0",
+    "grunt-contrib-qunit": "~1.2.0",
+    "grunt-contrib-uglify": "~1.0.0",
+    "phantomjs-prebuilt": "2.1.15",
+    "jszip-utils": "~0.0.2",
+    "package-json-versionify": "1.0.2",
+    "qunit-cli": "~0.2.0",
+    "qunitjs": "~1.23.0",
+    "tmp": "0.0.28"
+  },
+  "dependencies": {
+    "core-js": "~2.3.0",
+    "es6-promise": "~3.0.2",
+    "lie": "~3.1.0",
+    "pako": "~1.0.2",
+    "readable-stream": "~2.0.6"
+  },
+  "license": "(MIT OR GPL-3.0)"
 }
