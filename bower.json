@@ -1,14 +1,16 @@
 {
-  "name": "jquery",
-  "main": "dist/jquery.js",
+  "name": "chart.js",
+  "description": "Simple HTML5 charts using the canvas element.",
+  "homepage": "http://www.chartjs.org",
   "license": "MIT",
+  "version": "2.7.2",
+  "main": "./dist/Chart.js",
   "ignore": [
-    "package.json"
-  ],
-  "keywords": [
-    "jquery",
-    "javascript",
-    "browser",
-    "library"
+    ".github",
+    ".codeclimate.yml",
+    ".gitignore",
+    ".npmignore",
+    ".travis.yml",
+    "scripts"
   ]
 }

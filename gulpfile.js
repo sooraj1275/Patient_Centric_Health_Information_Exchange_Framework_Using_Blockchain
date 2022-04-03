@@ -1,182 +1,265 @@
-'use strict'
-
 var gulp = require('gulp');
-var browserSync = require('browser-sync').create();
-var sass = require('gulp-sass');
-var rename = require('gulp-rename');
-var del = require('del');
-var replace = require('gulp-replace');
-var injectPartials = require('gulp-inject-partials');
-var inject = require('gulp-inject');
-var sourcemaps = require('gulp-sourcemaps');
 var concat = require('gulp-concat');
+var connect = require('gulp-connect');
+var eslint = require('gulp-eslint');
+var file = require('gulp-file');
+var insert = require('gulp-insert');
+var replace = require('gulp-replace');
+var size = require('gulp-size');
+var streamify = require('gulp-streamify');
+var uglify = require('gulp-uglify');
+var util = require('gulp-util');
+var zip = require('gulp-zip');
+var exec = require('child-process-promise').exec;
+var karma = require('karma');
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
 var merge = require('merge-stream');
+var collapse = require('bundle-collapser/plugin');
+var yargs = require('yargs');
+var path = require('path');
+var fs = require('fs');
+var htmllint = require('gulp-htmllint');
+var package = require('./package.json');
 
-gulp.paths = {
-    dist: 'dist',
-};
+var argv = yargs
+  .option('force-output', {default: false})
+  .option('silent-errors', {default: false})
+  .option('verbose', {default: false})
+  .argv
 
-var paths = gulp.paths;
+var srcDir = './src/';
+var outDir = './dist/';
 
-gulp.task('sass', function () {
-    return gulp.src('./scss/**/style.scss')
-        .pipe(sourcemaps.init())
-        .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError))
-        .pipe(sourcemaps.write('./maps'))
-        .pipe(gulp.dest('./css'))
-        .pipe(browserSync.stream());
-});
+var header = "/*!\n" +
+  " * Chart.js\n" +
+  " * http://chartjs.org/\n" +
+  " * Version: {{ version }}\n" +
+  " *\n" +
+  " * Copyright " + (new Date().getFullYear()) + " Chart.js Contributors\n" +
+  " * Released under the MIT license\n" +
+  " * https://github.com/chartjs/Chart.js/blob/master/LICENSE.md\n" +
+  " */\n";
 
-// Static Server + watching scss/html files
-gulp.task('serve', gulp.series('sass', function() {
+if (argv.verbose) {
+  util.log("Gulp running with options: " + JSON.stringify(argv, null, 2));
+}
 
-    browserSync.init({
-        port: 3100,
-        server: "./",
-        ghostMode: false,
-        notify: false
-    });
+gulp.task('bower', bowerTask);
+gulp.task('build', buildTask);
+gulp.task('package', packageTask);
+gulp.task('watch', watchTask);
+gulp.task('lint', ['lint-html', 'lint-js']);
+gulp.task('lint-html', lintHtmlTask);
+gulp.task('lint-js', lintJsTask);
+gulp.task('docs', docsTask);
+gulp.task('test', ['lint', 'unittest']);
+gulp.task('size', ['library-size', 'module-sizes']);
+gulp.task('server', serverTask);
+gulp.task('unittest', unittestTask);
+gulp.task('library-size', librarySizeTask);
+gulp.task('module-sizes', moduleSizesTask);
+gulp.task('_open', _openTask);
+gulp.task('dev', ['server', 'default']);
+gulp.task('default', ['build', 'watch']);
 
-    gulp.watch('scss/**/*.scss', gulp.series('sass'));
-    gulp.watch('**/*.html').on('change', browserSync.reload);
-    gulp.watch('js/**/*.js').on('change', browserSync.reload);
+/**
+ * Generates the bower.json manifest file which will be pushed along release tags.
+ * Specs: https://github.com/bower/spec/blob/master/json.md
+ */
+function bowerTask() {
+  var json = JSON.stringify({
+      name: package.name,
+      description: package.description,
+      homepage: package.homepage,
+      license: package.license,
+      version: package.version,
+      main: outDir + "Chart.js",
+      ignore: [
+        '.github',
+        '.codeclimate.yml',
+        '.gitignore',
+        '.npmignore',
+        '.travis.yml',
+        'scripts'
+      ]
+    }, null, 2);
 
-}));
+  return file('bower.json', json, { src: true })
+    .pipe(gulp.dest('./'));
+}
 
+function buildTask() {
 
-// Static Server without watching scss files
-gulp.task('serve:lite', function() {
+  var errorHandler = function (err) {
+    if(argv.forceOutput) {
+      var browserError = 'console.error("Gulp: ' + err.toString() + '")';
+      ['Chart', 'Chart.min', 'Chart.bundle', 'Chart.bundle.min'].forEach(function(fileName) {
+        fs.writeFileSync(outDir+fileName+'.js', browserError);
+      });
+    }
+    if(argv.silentErrors) {
+      util.log(util.colors.red('[Error]'), err.toString());
+      this.emit('end');
+    } else {
+      throw err;
+    }
+  }
 
-    browserSync.init({
-        server: "./",
-        ghostMode: false,
-        notify: false
-    });
+  var bundled = browserify('./src/chart.js', { standalone: 'Chart' })
+    .plugin(collapse)
+    .bundle()
+    .on('error', errorHandler)
+    .pipe(source('Chart.bundle.js'))
+    .pipe(insert.prepend(header))
+    .pipe(streamify(replace('{{ version }}', package.version)))
+    .pipe(gulp.dest(outDir))
+    .pipe(streamify(uglify()))
+    .pipe(insert.prepend(header))
+    .pipe(streamify(replace('{{ version }}', package.version)))
+    .pipe(streamify(concat('Chart.bundle.min.js')))
+    .pipe(gulp.dest(outDir));
 
-    gulp.watch('**/*.css').on('change', browserSync.reload);
-    gulp.watch('**/*.html').on('change', browserSync.reload);
-    gulp.watch('js/**/*.js').on('change', browserSync.reload);
+  var nonBundled = browserify('./src/chart.js', { standalone: 'Chart' })
+    .ignore('moment')
+    .plugin(collapse)
+    .bundle()
+    .on('error', errorHandler)
+    .pipe(source('Chart.js'))
+    .pipe(insert.prepend(header))
+    .pipe(streamify(replace('{{ version }}', package.version)))
+    .pipe(gulp.dest(outDir))
+    .pipe(streamify(uglify()))
+    .pipe(insert.prepend(header))
+    .pipe(streamify(replace('{{ version }}', package.version)))
+    .pipe(streamify(concat('Chart.min.js')))
+    .pipe(gulp.dest(outDir));
 
-});
+  return merge(bundled, nonBundled);
 
+}
 
-gulp.task('sass:watch', function () {
-    gulp.watch('./scss/**/*.scss');
-});
+function packageTask() {
+  return merge(
+      // gather "regular" files landing in the package root
+      gulp.src([outDir + '*.js', 'LICENSE.md']),
 
+      // since we moved the dist files one folder up (package root), we need to rewrite
+      // samples src="../dist/ to src="../ and then copy them in the /samples directory.
+      gulp.src('./samples/**/*', { base: '.' })
+        .pipe(streamify(replace(/src="((?:\.\.\/)+)dist\//g, 'src="$1')))
+  )
+  // finally, create the zip archive
+  .pipe(zip('Chart.js.zip'))
+  .pipe(gulp.dest(outDir));
+}
 
-/* inject partials like sidebar and navbar */
-gulp.task('injectPartial', function () {
-    var injPartial1 =  gulp.src("./pages/**/*.html", { base: "./" })
-      .pipe(injectPartials())
-      .pipe(gulp.dest("."));
-    var injPartial2 =  gulp.src("./*.html", { base: "./" })
-      .pipe(injectPartials())
-      .pipe(gulp.dest("."));
-    return merge(injPartial1, injPartial2);
+function lintJsTask() {
+  var files = [
+    'samples/**/*.html',
+    'samples/**/*.js',
+    'src/**/*.js',
+    'test/**/*.js'
+  ];
+
+  // NOTE(SB) codeclimate has 'complexity' and 'max-statements' eslint rules way too strict
+  // compare to what the current codebase can support, and since it's not straightforward
+  // to fix, let's turn them as warnings and rewrite code later progressively.
+  var options = {
+    rules: {
+      'complexity': [1, 10],
+      'max-statements': [1, 30]
+    }
+  };
+
+  return gulp.src(files)
+    .pipe(eslint(options))
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+}
+
+function lintHtmlTask() {
+  return gulp.src('samples/**/*.html')
+    .pipe(htmllint({
+      failOnError: true,
+    }));
+}
+
+function docsTask(done) {
+  const script = require.resolve('gitbook-cli/bin/gitbook.js');
+  const cmd = process.execPath;
+
+  exec([cmd, script, 'install', './'].join(' ')).then(() => {
+    return exec([cmd, script, 'build', './', './dist/docs'].join(' '));
+  }).catch((err) => {
+    console.error(err.stdout);
+  }).then(() => {
+    done();
   });
+}
 
-/* inject Js and CCS assets into HTML */
-gulp.task('injectCommonAssets', function () {
-  return gulp.src('./**/*.html')
-    .pipe(inject(gulp.src([ 
-        './vendors/mdi/css/materialdesignicons.min.css',
-        './vendors/base/vendor.bundle.base.css', 
-        './vendors/base/vendor.bundle.base.js',
-    ], {read: false}), {name: 'plugins', relative: true}))
-    .pipe(inject(gulp.src([
-        './css/*.css', 
-        './js/off-canvas.js', 
-        './js/hoverable-collapse.js', 
-        './js/template.js',
-    ], {read: false}), {relative: true}))
-    .pipe(gulp.dest('.'));
-});
+function startTest() {
+  return [
+    {pattern: './test/fixtures/**/*.json', included: false},
+    {pattern: './test/fixtures/**/*.png', included: false},
+    './node_modules/moment/min/moment.min.js',
+    './test/jasmine.index.js',
+    './src/**/*.js',
+  ].concat(
+    argv.inputs ?
+      argv.inputs.split(';') :
+      ['./test/specs/**/*.js']
+  );
+}
 
-/* inject Js and CCS assets into HTML */
-gulp.task('injectLayoutStyles', function () {
-    return gulp.src('./**/*.html')
-        .pipe(inject(gulp.src([
-            './css/style.css', 
-        ], {read: false}), {relative: true}))
-        .pipe(gulp.dest('.'));
-});
+function unittestTask(done) {
+  new karma.Server({
+    configFile: path.join(__dirname, 'karma.conf.js'),
+    singleRun: !argv.watch,
+    files: startTest(),
+    args: {
+      coverage: !!argv.coverage
+    }
+  },
+  // https://github.com/karma-runner/gulp-karma/issues/18
+  function(error) {
+    error = error ? new Error('Karma returned with the error code: ' + error) : undefined;
+    done(error);
+  }).start();
+}
 
-/*replace image path and linking after injection*/
-gulp.task('replacePath', function(){
-    var replacePath1 = gulp.src(['./pages/*/*.html'], { base: "./" })
-        .pipe(replace('="images/', '="../../images/'))
-        .pipe(replace('href="pages/', 'href="../../pages/'))
-        .pipe(replace('href="documentation/', 'href="../../documentation/'))
-        .pipe(replace('href="index.html"', 'href="../../index.html"'))
-        .pipe(gulp.dest('.'));
-    var replacePath2 = gulp.src(['./pages/*.html'], { base: "./" })
-        .pipe(replace('="images/', '="../images/'))
-        .pipe(replace('"pages/', '"../pages/'))
-        .pipe(replace('href="index.html"', 'href="../index.html"'))
-        .pipe(gulp.dest('.'));
-    var replacePath3 = gulp.src(['./index.html'], { base: "./" })
-        .pipe(replace('="images/', '="images/'))
-        .pipe(gulp.dest('.'));
-    return merge(replacePath1, replacePath2, replacePath3);
-});
+function librarySizeTask() {
+  return gulp.src('dist/Chart.bundle.min.js')
+    .pipe(size({
+      gzip: true
+    }));
+}
 
-/*sequence for injecting partials and replacing paths*/
-gulp.task('inject', gulp.series('injectPartial' , 'injectCommonAssets' , 'injectLayoutStyles', 'replacePath'));
+function moduleSizesTask() {
+  return gulp.src(srcDir + '**/*.js')
+    .pipe(uglify())
+    .pipe(size({
+      showFiles: true,
+      gzip: true
+    }));
+}
 
+function watchTask() {
+  if (util.env.test) {
+    return gulp.watch('./src/**', ['build', 'unittest', 'unittestWatch']);
+  }
+  return gulp.watch('./src/**', ['build']);
+}
 
+function serverTask() {
+  connect.server({
+    port: 8000
+  });
+}
 
-gulp.task('clean:vendors', function () {
-    return del([
-      'vendors/**/*'
-    ]);
-});
+// Convenience task for opening the project straight from the command line
 
-/*Building vendor scripts needed for basic template rendering*/
-gulp.task('buildBaseVendorScripts', function() {
-    return gulp.src([
-        './node_modules/jquery/dist/jquery.min.js', 
-        './node_modules/popper.js/dist/umd/popper.min.js', 
-        './node_modules/bootstrap/dist/js/bootstrap.min.js', 
-        './node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js'
-    ])
-      .pipe(concat('vendor.bundle.base.js'))
-      .pipe(gulp.dest('./vendors/base'));
-});
-
-/*Building vendor styles needed for basic template rendering*/
-gulp.task('buildBaseVendorStyles', function() {
-    return gulp.src(['./node_modules/perfect-scrollbar/css/perfect-scrollbar.css'])
-      .pipe(concat('vendor.bundle.base.css'))
-      .pipe(gulp.dest('./vendors/base'));
-});
-
-gulp.task('copyRecursiveVendorFiles', function() {
-    var vFile1 = gulp.src(['./node_modules/chart.js/dist/Chart.min.js'])
-        .pipe(gulp.dest('./vendors/chart.js'));
-    var vFile2 = gulp.src(['./node_modules/datatables.net/js/jquery.dataTables.js'])
-        .pipe(gulp.dest('./vendors/datatables.net'));
-    var vFile3 = gulp.src(['./node_modules/datatables.net-bs4/js/dataTables.bootstrap4.js'])
-        .pipe(gulp.dest('./vendors/datatables.net-bs4'));
-    var vFile4 = gulp.src(['./node_modules/datatables.net-bs4/css/dataTables.bootstrap4.css'])
-        .pipe(gulp.dest('./vendors/datatables.net-bs4'));
-    var vFile5 = gulp.src(['./node_modules/@mdi/font/css/materialdesignicons.min.css'])
-        .pipe(gulp.dest('./vendors/mdi/css'));
-    var vFile6 = gulp.src(['./node_modules/@mdi/font/fonts/*'])
-        .pipe(gulp.dest('./vendors/mdi/fonts'));
-    return merge(vFile1, vFile2, vFile3, vFile4, vFile5, vFile6);
-});
-
-//Copy essential map files
-gulp.task('copyMapFiles', function() {
-    var map1 = gulp.src('node_modules/bootstrap/dist/js/bootstrap.min.js.map')
-        .pipe(gulp.dest('./vendors/base'));
-    var map2 = gulp.src('node_modules/@mdi/font/css/materialdesignicons.min.css.map')
-        .pipe(gulp.dest('./vendors/mdi/css'));
-    return merge(map1, map2);
-});
-
-/*sequence for building vendor scripts and styles*/
-gulp.task('bundleVendors', gulp.series('clean:vendors','buildBaseVendorStyles','buildBaseVendorScripts','copyRecursiveVendorFiles', 'copyMapFiles'));
-
-gulp.task('default', gulp.series('serve'));
+function _openTask() {
+  exec('open http://localhost:8000');
+  exec('subl .');
+}
