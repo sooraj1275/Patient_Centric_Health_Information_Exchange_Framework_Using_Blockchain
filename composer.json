@@ -1,26 +1,37 @@
 {
-    "name": "nnnick/chartjs",
-    "type": "library",
-    "description": "Simple HTML5 charts using the canvas element.",
-    "keywords": [
-        "chart",
-        "js"
-    ],
-    "homepage": "http://www.chartjs.org/",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "NICK DOWNIE",
-            "email": "hello@nickdownie.com"
-        }
-    ],
-    "require": {
-        "php": ">=5.3.3"
+  "name": "twbs/bootstrap",
+  "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
+  "keywords": [
+    "css",
+    "js",
+    "sass",
+    "mobile-first",
+    "responsive",
+    "front-end",
+    "framework",
+    "web"
+  ],
+  "homepage": "https://getbootstrap.com/",
+  "authors": [
+    {
+      "name": "Mark Otto",
+      "email": "markdotto@gmail.com"
     },
-    "minimum-stability": "stable",
-    "extra": {
-        "branch-alias": {
-            "release/2.0": "v2.0-dev"
-        }
+    {
+      "name": "Jacob Thornton",
+      "email": "jacobthornton@gmail.com"
     }
+  ],
+  "support": {
+    "issues": "https://github.com/twbs/bootstrap/issues"
+  },
+  "license": "MIT",
+  "extra": {
+    "branch-alias": {
+      "dev-master": "3.3.x-dev"
+    }
+  },
+  "replace": {
+    "twitter/bootstrap": "self.version"
+  }
 }
