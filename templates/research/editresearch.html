@@ -1,0 +1,52 @@
+{% extends 'research/index.html' %}
+{% block body %}
+<form action="/research_update_profile" method="post" enctype="multipart/form-data" name="form1" id="form1">
+  <table class="table table-borderless">
+    <tr>
+      <td>
+          <input type="file" name="fileField" id="fileField" />
+      </td>
+    </tr>
+    <tr>
+      <td>name
+        <label for="textfield"></label>
+      <input type="text" name="textfield" id="textfield"  value="{{ res['name'] }}" class="form-control" required/></td>
+    </tr>
+    <tr>
+      <td>phno
+        <label for="textfield2"></label>
+      <input type="text" name="textfield2" id="textfield2" value="{{ res['phonenumber'] }}" class="form-control" required/></td>
+    </tr>
+
+    <tr>
+      <td>email
+        <label for="textfield4"></label>
+      <input type="text" name="textfield4" id="textfield4" value="{{ res['email'] }}" class="form-control" required/></td>
+    </tr>
+    <tr>
+      <td>Place
+        <label for="textfield5"></label>
+      <input type="text" name="textfield5" id="textfield5" value="{{ res['place'] }}" class="form-control" required/></td>
+    </tr>
+    <tr>
+      <td><p>pin
+        <label for="textfield6"></label>
+        <input type="text" name="textfield6" id="textfield6" value="{{ res['pin'] }}" class="form-control" required/>
+      </p></td>
+    </tr>
+
+      <tr>
+      <td>Post
+        <label for="textfield3"></label>
+      <input type="text" name="textfield3" id="textfield3" value="{{ res['post'] }}" class="form-control" required/></td>
+    </tr>
+
+
+    <tr>
+      <td height="90">
+                      <input type="submit" name="button" id="button" value="edit" class="btn btn-outline-success"/>
+               </td>
+    </tr>
+  </table>
+</form>
+{% endblock %}

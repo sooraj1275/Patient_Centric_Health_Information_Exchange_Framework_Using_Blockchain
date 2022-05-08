@@ -1,0 +1,38 @@
+{% extends 'research/index.html' %}
+{% block body %}
+<table class="table table-bordered">
+  <tr>
+    <th>#</th>
+    <th colspan="2">Name</th>
+    <th>Gender</th>
+    <th>Place</th>
+    <th>District</th>
+    <th>Pin</th>
+    <th>Email</th>
+    <th>Phone</th>
+      <th></th>
+
+  </tr>
+    {% for i in data %}
+  <tr>
+    <td width="50px">{{ loop.index }}</td>
+    <td>{{ i['name'] }}</td>
+    <td>
+          <img src="{{ i['photo'] }}" width="90px" height="90px"/>
+    </td>
+    <td>{{ i['gender'] }}</td>
+    <td>{{ i['place'] }}</td>
+    <td>{{ i['district'] }}</td>
+    <td>{{ i['pin'] }}</td>
+    <td>{{ i['email'] }}</td>
+    <td>{{ i['phonenumber'] }}</td>
+  <td width="50px">
+      <a href="/researchviewfiles/{{ i['lid'] }}" class="btn btn-success">Files</a>
+  </td>
+  </tr>
+    {% endfor %}
+</table>
+
+</form>
+
+{% endblock %}

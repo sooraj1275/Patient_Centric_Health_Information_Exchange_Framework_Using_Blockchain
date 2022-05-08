@@ -1,0 +1,16 @@
+{% extends 'doctor/index.html' %}
+{% block body %}
+<form id="form1" name="form1" method="post" action="/doctorsentcomplaintpost">
+  <table width="200" border="1">
+
+    <tr>
+      <td>Complaint</td>
+      <td><textarea name="textarea" class="form-control"></textarea></td>
+    </tr>
+    <tr>
+        <td></td>
+      <td><input type="submit" name="Submit" value="Sent Complaint" /></td>
+    </tr>
+  </table>
+</form>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'heakthins/index.html' %}
+{% block body %}
+
+    <img src="{{ data['photo'] }}" width="200px" height="200px"/>
+
+
+<table class="table table-bordered">
+<tr>
+    <th width="150px">Name</th>
+    <th>{{ data['name'] }}</th>
+</tr>
+
+    <tr>
+        <th>Phone Number</th>
+        <th>
+            {{ data['phonenumber'] }}
+        </th>
+    </tr>
+
+    <tr>
+        <th>Email</th>
+        <th>
+            {{ data['email'] }}
+        </th>
+    </tr>
+
+    <tr>
+        <th>Place</th>
+        <th>
+            {{ data['place'] }}
+        </th>
+    </tr>
+
+    <tr>
+        <th>Pin</th>
+        <th>
+            {{ data['pin'] }}
+        </th>
+    </tr>
+
+     <tr>
+        <th>Post</th>
+        <th>
+            {{ data['post'] }}
+        </th>
+    </tr>
+
+       <tr>
+        <th>District</th>
+        <th>
+            {{ data['district'] }}
+        </th>
+
+
+
+    </tr>
+
+<tr>
+    <td>
+        <a href="/edit_heakthins" class="btn btn-success">Edit</a>
+    </td>
+
+</tr>
+
+
+
+
+
+</table>
+
+
+
+
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'user/userindex.html' %}
+{% block body %}
+<h3>Upload EHR</h3>
+
+    <br>
+    <form action="/useruploadphtpost" method="post" enctype="multipart/form-data">
+
+    <table class="table table-bordered">
+    <tr>
+        <th>SlNo</th>
+{#        `fid` `` `` `` `` `uploadedbyid` `uploadedtype`#}
+        <th>FileName</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Date</th>
+        <th>UploadedBy</th>
+    </tr>
+
+        {% for i in ks %}
+
+        <tr>
+        <td width="50px">
+            {{ loop.index }}
+        </td>
+        <td>
+            {{ i['filename'] }}
+        </td> <td>
+            {{ i['type'] }}
+        </td> <td>
+            {{ i['description'] }}
+        </td> <td>
+            {{ i['dte'] }}
+        </td> <td>
+            {{ i['uploadedbyid'] }}
+        </td>
+
+        </tr>
+
+        {% endfor %}
+    </table>
+</form>
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'doctor/index.html' %}
+{% block body %}
+<body>
+<form name="f1" action="/doctoraddschedulepost" method="post" enctype="multipart/form-data">
+    <table class="table table-bordered">
+        <tr>
+            <td width="150px">Date</td>
+            <td><input type="date" name="date" class="form-control" required></td>
+        </tr>
+        <tr>
+            <td>FromTime</td>
+            <td><input type="time" name="from" class="form-control" required></td>
+        </tr>
+        <tr>
+            <td>ToTime</td>
+            <td><input type="time" name="to" class="form-control" required></td>
+        </tr>
+        
+      
+        
+        <tr>
+            <td></td>
+            <td><input type="submit" name="s1" value="Upload" class="btn tbn-outline-success"></td>
+        </tr>
+    </table>
+</form>
+</body>
+{% endblock %}

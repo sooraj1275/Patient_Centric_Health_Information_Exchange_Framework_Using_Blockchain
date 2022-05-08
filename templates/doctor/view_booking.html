@@ -1,0 +1,30 @@
+{% extends 'doctor/index.html' %}
+{% block body %}
+<form id="form1" name="form1" method="post" action="/doc_view_booking_search">
+
+  <table class="table table-bordered">
+    <tr>
+      <th>sl.no</th>
+      <th>Name</td>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Place</th>
+        <th></th>
+        <th></th>
+
+
+    </tr>
+    {% for i in data %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ i['name'] }}</td>
+      <td>{{ i['email'] }}</td>
+        <td>{{ i['phonenumber'] }}</td>
+        <td>{{ i['place'] }}</td>
+        <td><a href="/doctoraddprescription/{{ i['bid'] }}">AddPrescription</a></td>
+        <td><a href="/doctorbookingmore/{{ i['bid'] }}">More</a></td>
+       </tr>
+    {% endfor %}
+  </table>
+</form>
+{% endblock %}

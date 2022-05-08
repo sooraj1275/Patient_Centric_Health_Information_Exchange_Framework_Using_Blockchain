@@ -1,0 +1,30 @@
+{% extends 'doctor/index.html' %}
+{% block body %}
+
+<form name="d1" action="/view_doc_article_search" method="post">
+ 
+  <table class="table table-bordered">
+    <tr>
+      <th>S.No</th>
+      <th>Date</th>
+      <th>FromTime</th>
+      <th>ToTime</th>
+      <th></th>
+    </tr>
+    {% for i in data %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ i['date'] }}</td>
+      <td>{{ i['fr'] }}</td>
+      <td>{{ i['tot'] }}</td>
+      <td width="50px"><a href="/doctordeleteschedule/{{ i['scid'] }}" class="btn btn-danger">Delete</a></td>
+      <td width="50px"><a href="/doc_view_booking/{{ i['scid'] }}" class="btn btn-success">Booking</a></td>
+    
+      
+    </tr>
+
+    {% endfor %}
+  </table>
+</form>
+
+{% endblock %}

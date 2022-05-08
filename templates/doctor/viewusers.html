@@ -1,0 +1,42 @@
+{% extends 'doctor/index.html' %}
+{% block body %}
+<table class="table table-bordered">
+  <tr>
+    <th>#</th>
+    <th colspan="2">Name</th>
+    <th>Gender</th>
+    <th>Place</th>
+    <th>District</th>
+    <th>Pin</th>
+    <th>Email</th>
+    <th>Phone</th>
+      <th></th>
+      <th></th>
+      <th></th>
+
+  </tr>
+    {% for i in data %}
+  <tr>
+    <td width="50px">{{ loop.index }}</td>
+    <td>{{ i['name'] }}</td>
+    <td>
+          <img src="{{ i['photo'] }}" width="90px" height="90px"/>
+    </td>
+    <td>{{ i['gender'] }}</td>
+    <td>{{ i['place'] }}</td>
+    <td>{{ i['district'] }}</td>
+    <td>{{ i['pin'] }}</td>
+    <td>{{ i['email'] }}</td>
+    <td>{{ i['phonenumber'] }}</td>
+    <td width="50px">
+        <a href="/doctor_uploadphr/{{ i['lid'] }}" class="btn btn-success">Add EHR</a></td>
+      <td width="50px">  <a href="/doctorviewfiles/{{ i['lid'] }}" class="btn btn-success">ALL EHR</a></td>
+      <td width="50px"> <a href="/doctorviewphrofpatient_uploadedbyhim/{{ i['lid'] }}" class="btn btn-success">UPLOADED BY ME</a></td>
+    </td>
+  </tr>
+    {% endfor %}
+</table>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'doctor/index.html' %}
+{% block body %}
+
+<table class="table table-bordered">
+     <tr>
+      <th>Slno.</th>
+      <th>Date</th>
+      <th>Complaint</th>
+      <th>Reply</th>
+    </tr>
+    {% for i in data %}
+    <tr>
+      <td width="50px">&nbsp;{{ loop.index }}</td>
+        <td>{{ i["date"]}}</td>
+        <td>{{ i["questions"]}}</td>
+        <td>{{ i["reply"]}}</td>
+    </tr>
+    {% endfor %}
+</table>
+</form>
+{% endblock %}

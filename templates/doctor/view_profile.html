@@ -1,0 +1,42 @@
+{% extends 'doctor/index.html' %}
+{% block body %}
+<form action="" method="post" enctype="multipart/form-data" name="form1" id="form1">
+  <table class="table table-bordered" style="padding: 5px;">
+    <tr>
+      <td colspan="2">
+     <img src="{{ res['photo'] }}" alt="" height="100px" width="100px"/></td>
+    </tr>
+    <tr>
+        <td width="150px">Name</td><td>
+       {{ res['name'] }}</td>
+    </tr>
+    <tr>
+        <td>Gender</td><td>
+      {{ res['gender'] }}</td>
+    </tr>
+    <tr>
+        <td>Phone number</td><td>
+       {{ res['phonenumber'] }} </td>
+    </tr>
+    <tr>
+        <td>Email</td>
+      <td> {{ res['email'] }} </td>
+    </tr>
+    <tr>
+        <td>Location</td><td>
+       {{ res['latitude'] }} {{ res['longitude'] }}</td>
+    </tr>
+    <tr>
+        <td>Qualification</td>
+       <td> {{ res['qualification'] }}
+      </td>
+    </tr>
+    <tr>
+        <td></td>
+      <td>
+                        <a href="/edit_doctor" class="btn btn-success">Edit</a>
+                   </td>
+    </tr>
+  </table>
+</form>
+{% endblock %}

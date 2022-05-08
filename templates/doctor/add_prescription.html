@@ -1,0 +1,21 @@
+{% extends 'doctor/index.html' %}
+{% block body %}
+<form id="form1" name="form1" method="post" action="/doctoraddprescriptionpost">
+  <table class="table table-borderless">
+    <tr>
+        <td width="150px">Prescription</td>
+        <td>
+            <textarea name="prescription" class="form-control"></textarea>
+        </td>
+    </tr>
+      <tr>
+          <td></td>
+          <td>
+              <input type="submit" class="btn btn-success" value="Submit">
+          </td>
+      </tr>
+
+
+  </table>
+</form>
+{% endblock %}

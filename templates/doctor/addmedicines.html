@@ -1,0 +1,67 @@
+{% extends 'doctor/index.html' %}
+{% block body %}
+<form id="form1" name="form1" method="post" action="/doctoraddmedicinespost">
+  <table class="table table-borderless">
+    <tr>
+        <td width="150px">Choose Medicine</td>
+        <td>
+           <select class="form-control" name="medicine">
+               {% for i in data %}
+               <option value="{{ i['mid'] }}">{{ i['medicine'] }}</option>
+               {% endfor %}
+           </select>
+        </td>
+    </tr>
+      <tr>
+          <td>Dosage</td>
+          <td>
+              <input type="text" name="dossage" class="form-control">
+          </td>
+      </tr>
+      <tr>
+          <td></td>
+          <td>
+              <input type="submit" class="btn btn-success" value="Submit">
+          </td>
+      </tr>
+
+
+  </table>
+<br>
+
+<table>
+    <tr>
+        <th>Sno</th>
+        <th>MedicineName</th>
+        <th>Dossage</th>
+        <th></th>
+    </tr>
+
+    {% for i in data1 %}
+    <tr>
+    <td>{{ loop.index }}</td>
+    <td>{{ i['medicine'] }}</td>
+    <td>{{ i['dossage'] }}</td>
+    <td width="50px">
+        <a href="/doctordeletemedicine/{{ i['mid'] }}" class="btn btn-danger">Delete</a>
+    </td>
+
+    </tr>
+
+
+    {% endfor %}
+
+
+
+</table>
+
+<br>
+
+<a href="/doctoraddlabdetails" class="btn btn-success">Next</a>
+
+
+
+
+
+</form>
+{% endblock %}

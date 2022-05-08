@@ -1,0 +1,57 @@
+{% extends 'doctor/index.html' %}
+{% block body %}
+<form id="form1" name="form1" method="post" action="/doctoraddlabdetailspost">
+  <table class="table table-borderless">
+    <tr>
+        <td width="150px">TestName</td>
+        <td>
+          <input type="text" name="lab" class="form-control" required >
+        </td>
+    </tr>
+
+      <tr>
+          <td></td>
+          <td>
+              <input type="submit" class="btn btn-success" value="Submit">
+          </td>
+      </tr>
+
+
+  </table>
+<br>
+
+<table>
+    <tr>
+        <th>Sno</th>
+        <th>Testname</th>
+
+        <th></th>
+    </tr>
+
+    {% for i in res %}
+    <tr>
+    <td>{{ loop.index }}</td>
+    <td>{{ i['labname'] }}</td>
+
+    <td width="50px">
+        <a href="/doctordeletetest/{{ i['lid'] }}" class="btn btn-danger">Delete</a>
+    </td>
+
+    </tr>
+
+
+    {% endfor %}
+
+
+
+</table>
+
+<br>
+
+
+<a href="/doctorviewschedule" class="btn btn-success">Finish</a>
+
+
+
+</form>
+{% endblock %}

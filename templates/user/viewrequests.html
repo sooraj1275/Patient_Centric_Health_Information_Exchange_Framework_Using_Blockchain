@@ -1,0 +1,59 @@
+{% extends 'user/userindex.html' %}
+{% block body %}
+<h3>Upload EHR</h3>
+
+    <br>
+    <form action="/useruploadphtpost" method="post" enctype="multipart/form-data">
+
+    <table class="table table-bordered">
+    <tr>
+        <th>SlNo</th>
+{#        `fid` `` `` `` `` `uploadedbyid` `uploadedtype`#}
+        <th>FileName</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Date</th>
+        <th>UploadedBy</th>
+        <th>RequestedBy</th>
+        <th></th>
+        <th></th>
+    </tr>
+
+        {% for i in ks %}
+
+        <tr>
+        <td width="50px">
+            {{ loop.index }}
+        </td>
+        <td>
+            {{ i['filename'] }}
+        </td> <td>
+            {{ i['type'] }}
+        </td> <td>
+            {{ i['description'] }}
+        </td> <td>
+            {{ i['dte'] }}
+        </td> <td>
+            {{ i['uploadedbyid'] }}
+        </td>
+        <td>
+            {{ i['name'] }}
+            <br>
+            <img src="{{ i['photo'] }}" width="100px" height="100px"/>
+            <br>
+            {{ i['email'] }}
+        </td>
+        <td width="50px">
+            <a href="/acceptrequest/{{ i['requestid'] }}" class="btn btn-success">Accept</a>
+        </td>
+         <td width="50px">
+            <a href="/rejectrequest/{{ i['requestid'] }}" class="btn btn-danger">Reject</a>
+        </td>
+
+        </tr>
+
+        {% endfor %}
+    </table>
+</form>
+
+{% endblock %}
